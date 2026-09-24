@@ -1,0 +1,58 @@
+---
+
+### 2. GitHub Actions Automation
+
+#### `.github/workflows/daily_analysis.yml`
+```yaml
+name: Daily Stock Market Scan & Analysis
+
+on:
+  schedule:
+    # รันอัตโนมัติทุกวันจันทร์ - ศุกร์ เวลา 08:00 น. (เวลาไทย / 01:00 UTC)
+    - cron: '0 1 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  analyze-watchlist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r backend/requirements.txt
+
+      - name: Run Daily Analysis Script
+        env:
+          AI_PROVIDER: 'cloud'
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python -c "
+          from backend.app.services.market_data import MarketDataService
+          from backend.app.services.ai_strategy import AIStrategyEngine
+          
+          market = MarketDataService()
+          ai = AIStrategyEngine()
+          
+          watchlist = ['MU', 'PLRT', 'SDNK', 'TSLA', 'AAPL']
+          for ticker in watchlist:
+              data = market.get_stock_indicators(ticker)
+              if 'error' not in data:
+                  analysis = ai.analyze_trading_signal(
+                      ticker=ticker,
+                      current_price=data['current_price'],
+                      rsi=data['rsi'],
+                      ema20=data['ema20'],
+                      ema50=data['ema50'],
+                      atr=data['atr'],
+                      news_sentiment_score=2.0
+                  )
+                  print(f'=== {ticker} Analysis ===')
+                  print(analysis)
+          "
