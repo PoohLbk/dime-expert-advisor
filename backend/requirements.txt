@@ -1,8 +1,8 @@
 fastapi>=0.110.0
 uvicorn>=0.28.0
 yfinance>=0.2.37
-pandas>=2.2.0
-pandas-ta
+pandas<3.0.0
+git+https://github.com/twopirllc/pandas-ta.git@development
 requests>=2.31.0
 google-genai>=0.1.0
 pydantic-settings>=2.2.1
