@@ -13,7 +13,7 @@ class MarketDataService:
             if df.empty:
                 return {"error": "No data found for ticker"}
 
-            # คำนวณ Indicators ด้วยไลบรารี ta
+            # Calculate Indicators using the 'ta' library
             ema20_ind = EMAIndicator(close=df['Close'], window=20)
             ema50_ind = EMAIndicator(close=df['Close'], window=50)
             rsi_ind = RSIIndicator(close=df['Close'], window=14)
