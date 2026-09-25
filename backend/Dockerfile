@@ -2,11 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# ติดตั้ง GCC และ Build Tools ที่จำเป็นสำหรับการ Compile แพ็กเกจ Python
+# ติดตั้ง git และ build tools ที่จำเป็นสำหรับการดึงแพ็กเกจจาก GitHub
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
     build-essential \
     gcc \
-    && rm -rf /lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
