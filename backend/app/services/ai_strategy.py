@@ -24,7 +24,7 @@ class AIStrategyEngine:
         if settings.AI_PROVIDER == "cloud" and settings.GEMINI_API_KEY:
             from google import genai
             client = genai.Client(api_key=settings.GEMINI_API_KEY)
-            res = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+            res = client.models.generate_content(model="gemini-3.8-flash", contents=prompt)
             return res.text
         else:
             payload = {"model": settings.OLLAMA_DEEPSEEK_MODEL, "prompt": prompt, "stream": False}
