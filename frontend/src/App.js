@@ -1,25 +1,163 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Menu, X, Activity, ShieldAlert, Target } from 'lucide-react';
-import axios from 'axios';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ArrowRight, Menu, X, ArrowLeft } from 'lucide-react';
 
-const API_BASE = 'https://dime-expert-advisor.onrender.com';
+// ==========================================
+// 1. โลโก้สำหรับหน้า Halo
+// ==========================================
+const LogoIcon = ({ className }) => (
+  <svg viewBox="0 0 256 256" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M 128.005 191.173 C 128.448 156.208 156.93 128 192 128 L 192 64 L 128 64 C 128 99.346 99.346 128 64 128 L 64 192 L 128 192 Z M 192 256 L 64 256 C 28.654 256 0 227.346 0 192 L 0 64 L 64 64 L 64 0 L 192 0 C 227.346 0 256 28.654 256 64 L 256 192 L 192 192 Z" />
+  </svg>
+);
 
+// ==========================================
+// 2. หน้าจอ UI ใหม่ (Halo) - บังคับธีมสีเขียว
+// ==========================================
+const HaloDashboard = ({ onBack }) => {
+  // ตั้งค่าเป็น Theme เขียวตามที่ลูกค้าขอ
+  const theme = {
+    text: 'text-[#064E3B]',
+    textMuted: 'text-[#064E3B]/70',
+    textMutedStrong: 'text-[#064E3B]/60',
+    btnBg: 'bg-[#064E3B] hover:bg-[#047857]',
+    cardBg: 'bg-[#064E3B]',
+  };
+
+  const heroBrands = [
+    { name: 'Stripe', style: { fontFamily: 'Georgia, serif', fontWeight: 700, letterSpacing: '-0.02em', fontSize: '15px' } },
+    { name: 'COINBASE', style: { fontFamily: 'Arial, sans-serif', fontWeight: 900, letterSpacing: '0.08em', fontSize: '13px', textTransform: 'uppercase' } },
+    { name: 'Uniswap', style: { fontFamily: '"Trebuchet MS", sans-serif', fontWeight: 600, letterSpacing: '0.01em', fontSize: '15px', fontStyle: 'italic' } },
+    { name: 'AAVE', style: { fontFamily: '"Courier New", monospace', fontWeight: 700, letterSpacing: '0.12em', fontSize: '13px', textTransform: 'uppercase' } },
+    { name: 'Compound', style: { fontFamily: 'Palatino, "Book Antiqua", serif', fontWeight: 400, letterSpacing: '-0.01em', fontSize: '16px' } }
+  ];
+
+  const backerBrands = [
+    { name: 'Fundamental Labs', style: { fontFamily: '"Times New Roman", serif', fontWeight: 400, letterSpacing: '0.02em', fontSize: '14px' } },
+    { name: 'KUCOIN', style: { fontFamily: '"Arial Black", sans-serif', fontWeight: 900, letterSpacing: '0.08em', fontSize: '16px' } },
+    { name: 'NGC', style: { fontFamily: 'Impact, sans-serif', fontWeight: 700, letterSpacing: '0.05em', fontSize: '18px' } },
+    { name: 'NxGen', style: { fontFamily: 'Georgia, serif', fontWeight: 600, letterSpacing: '-0.02em', fontSize: '17px' } }
+  ];
+
+  return (
+    <div className="flex flex-col bg-[#F5F5F5] min-h-screen font-['TT_Norms_Pro',_sans-serif] animate-fade-in">
+      <style>{`
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .marquee-track { display: flex; width: max-content; animation: marquee 22s linear infinite; }
+        .backers-track { display: flex; width: max-content; animation: marquee 30s linear infinite; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
+
+      {/* Navbar */}
+      <div className="h-screen flex flex-col overflow-hidden relative">
+        <nav className="absolute top-0 left-0 right-0 z-20 px-6 py-5">
+          <div className="flex items-center justify-between max-w-[88rem] mx-auto">
+            <div className={`flex items-center gap-4 ${theme.text}`}>
+              <button onClick={onBack} className="p-2 hover:bg-black/5 rounded-full transition-colors" title="Back to DEA">
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-2">
+                <LogoIcon className="w-7 h-7" />
+                <span className="text-2xl font-medium tracking-tight">Halo</span>
+              </div>
+            </div>
+            <div className="hidden md:flex gap-8">
+              {['Network', 'Ecosystem', 'Rewards', 'Help', 'News'].map((link) => (
+                <a key={link} href={`#${link}`} className="text-base font-medium text-[#064E3B]/70 hover:text-[#064E3B] transition-colors duration-200">
+                  {link}
+                </a>
+              ))}
+            </div>
+            <button className={`${theme.btnBg} text-white text-base font-medium px-7 py-2.5 rounded-full transition-colors duration-200`}>
+              Open Wallet
+            </button>
+          </div>
+        </nav>
+
+        {/* Hero */}
+        <section className="flex-1 px-6 pt-20 pb-6 flex items-end">
+          <div className="relative w-full rounded-2xl overflow-hidden max-w-[88rem] mx-auto" style={{ height: 'calc(100vh - 96px)' }}>
+            <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260423_161253_c72b1869-400f-45ed-ac0c-52f68c2ed5bd.mp4" />
+            <div className="relative z-10 flex flex-col items-start justify-start h-full p-12 pt-36">
+              <h1 className={`${theme.text} text-5xl md:text-6xl font-medium leading-tight max-w-xl mb-4`} style={{ letterSpacing: '-0.04em' }}>
+                Your Wealth<br />Works
+              </h1>
+              <p className={`${theme.textMuted} text-base md:text-lg max-w-md mb-8 leading-relaxed`}>
+                An automated, reward-powered digital dollar built for native passive earnings and effortless connection into DeFi.
+              </p>
+              <button className={`inline-flex items-center gap-3 ${theme.btnBg} text-white text-base md:text-lg font-medium pl-8 pr-2 py-2 rounded-full group`}>
+                Join us
+                <div className="bg-white rounded-full p-2 group-hover:scale-105 transition-transform duration-200">
+                  <ArrowRight className={`w-5 h-5 ${theme.text}`} />
+                </div>
+              </button>
+
+              <div className="mt-24 w-full max-w-md overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
+                <div className="marquee-track">
+                  {[...heroBrands, ...heroBrands, ...heroBrands].map((brand, i) => (
+                    <div key={i} className={`mx-7 shrink-0 whitespace-nowrap ${theme.textMutedStrong}`} style={brand.style}>
+                      {brand.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Info Section */}
+      <section className="bg-[#F5F5F5] px-6 py-24">
+        <div className="max-w-[88rem] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 items-start">
+            <div>
+              <h2 className={`${theme.text} text-4xl md:text-5xl font-medium leading-tight mb-8`} style={{ letterSpacing: '-0.03em' }}>
+                Meet USD Halo.
+              </h2>
+              <button className={`inline-flex items-center gap-3 ${theme.btnBg} text-white text-base font-medium pl-8 pr-2 py-2 rounded-full group`}>
+                Discover it
+                <div className="bg-white rounded-full p-2 group-hover:scale-105 transition-transform duration-200">
+                  <ArrowRight className={`w-5 h-5 ${theme.text}`} />
+                </div>
+              </button>
+            </div>
+            <div>
+              <p className={`${theme.textMuted} text-2xl md:text-3xl leading-relaxed`}>
+                USD Halo is a reward-earning dollar coin that lets your savings grow while remaining tied to the U.S. dollar.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="lg:col-span-2 rounded-2xl p-7 min-h-80 flex flex-col justify-between" style={{ backgroundImage: 'url("https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260423_164207_f243351d-ed59-48ec-83a0-a5e996bdbe3c.png&w=1280&q=85")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+              <h3 className={`${theme.text} text-2xl font-medium leading-snug`} style={{ letterSpacing: '-0.02em' }}>Savings that bloom</h3>
+              <p className={`${theme.textMuted} text-base max-w-xs`}>Gain steady returns as your dollar tokens are routed into top-performing DeFi strategies.</p>
+            </div>
+            <div className={`${theme.cardBg} rounded-2xl p-7 min-h-80 flex flex-col justify-between`}>
+              <h3 className="text-white text-2xl font-medium whitespace-pre-line">Always fluid,{'\n'}always pegged.</h3>
+              <p className="text-white/60 text-base">Keep fully dollar-anchored with on-demand access to funds — no lockups or waits.</p>
+            </div>
+            <div className={`${theme.cardBg} rounded-2xl p-7 min-h-80 flex flex-col justify-between`}>
+              <h3 className="text-white text-2xl font-medium whitespace-pre-line">Fully{'\n'}automated</h3>
+              <p className="text-white/60 text-base">Skip the task of tuning positions yourself. USD Halo runs in the background for you.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ==========================================
+// 3. หน้าแรก (DEA Landing Page) & ตัวจัดการ State
+// ==========================================
 export default function App() {
   const [isStarted, setIsStarted] = useState(false);
   const videoRef = useRef(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Dashboard States
-  const [ticker, setTicker] = useState('NVDA');
-  const [data, setData] = useState(null);
-  const [chartData, setChartData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
   useEffect(() => {
-    if (isStarted) return; // ไม่โหลดวิดีโอถ้าอยู่หน้า Dashboard
-
+    if (isStarted) return;
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1';
     script.onload = () => {
@@ -28,261 +166,34 @@ export default function App() {
         const hls = new window.Hls({ enableWorker: false });
         hls.loadSource(videoSrc);
         hls.attachMedia(videoRef.current);
-        hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
-          videoRef.current?.play().catch(err => console.log('Autoplay prevented:', err));
-        });
+        hls.on(window.Hls.Events.MANIFEST_PARSED, () => videoRef.current?.play().catch(() => {}));
       } else if (videoRef.current && videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
         videoRef.current.src = videoSrc;
-        videoRef.current.addEventListener('loadedmetadata', () => {
-          videoRef.current?.play().catch(err => console.log('Autoplay prevented:', err));
-        });
+        videoRef.current.addEventListener('loadedmetadata', () => videoRef.current?.play().catch(() => {}));
       }
     };
     document.head.appendChild(script);
-
-    return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
+    return () => { if (document.head.contains(script)) document.head.removeChild(script); };
   }, [isStarted]);
 
-  const analyzeStock = async () => {
-    if (!ticker) return;
-    setLoading(true);
-    setError('');
-    setData(null);
-    setChartData([]);
-    try {
-      const res = await axios.get(`${API_BASE}/api/v1/analyze/${ticker}`);
-      setData(res.data);
-      
-      const current = res.data.market_data.current_price;
-      const mockHistory = Array.from({length: 14}).map((_, i) => ({
-        day: `Day ${i + 1}`,
-        price: current * (1 + (Math.random() - 0.5) * 0.05),
-      }));
-      mockHistory.push({ day: 'Current', price: current });
-      setChartData(mockHistory);
-
-    } catch (err) {
-      setError(err.response?.data?.detail || "เกิดข้อผิดพลาดในการดึงข้อมูล");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  let aiRec = {};
-  if (data?.ai_recommendation) {
-    try {
-      aiRec = typeof data.ai_recommendation === 'string' 
-        ? JSON.parse(data.ai_recommendation.replace(/```json/g, '').replace(/```/g, '')) 
-        : data.ai_recommendation;
-    } catch (e) {
-      console.error("Failed to parse AI JSON", e);
-    }
-  }
-
-  // --------------------------------------------------------
-  // VIEW 2: DASHBOARD SCREEN
-  // --------------------------------------------------------
+  // หากกดปุ่ม Get Started แล้ว ให้แสดงหน้า Halo UI สีเขียว
   if (isStarted) {
-    return (
-      <div className="min-h-screen bg-[#070b0a] text-white font-['Inter'] p-6 md:p-12">
-        <header className="flex justify-between items-center mb-12">
-          <div className="text-2xl font-bold tracking-tighter cursor-pointer" onClick={() => setIsStarted(false)}>
-            DEA<span className="text-[#5ed29c]">.</span>
-          </div>
-          <button onClick={() => setIsStarted(false)} className="text-sm font-medium text-white/60 hover:text-white transition-colors">
-            Back to Home
-          </button>
-        </header>
-
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-8">AI Stock Scanner</h1>
-          
-          <div className="flex flex-col md:flex-row gap-4 mb-10 max-w-2xl">
-            <input 
-              type="text" 
-              value={ticker}
-              onChange={(e) => setTicker(e.target.value.toUpperCase())}
-              onKeyDown={(e) => e.key === 'Enter' && analyzeStock()}
-              placeholder="Enter Ticker (e.g. AAPL, NVDA)"
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-white focus:outline-none focus:border-[#5ed29c] transition-colors text-lg uppercase tracking-wide"
-            />
-            <button 
-              onClick={analyzeStock}
-              disabled={loading}
-              className="bg-[#5ed29c] text-[#070b0a] font-bold px-10 py-4 rounded-xl hover:bg-white active:scale-95 transition-all disabled:opacity-50"
-            >
-              {loading ? 'ANALYZING...' : 'SCAN ASSET'}
-            </button>
-          </div>
-
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-6 py-4 rounded-xl mb-8">
-              {error}
-            </div>
-          )}
-
-          {data && (
-            <div className="space-y-8 animate-fade-in">
-              {/* Chart Section */}
-              {chartData.length > 0 && (
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 h-[400px]">
-                  <h3 className="text-lg font-semibold text-white/80 mb-6 flex items-center gap-2">
-                    <Activity size={20} className="text-[#5ed29c]" /> 
-                    {ticker} Price Trend (14 Days)
-                  </h3>
-                  <ResponsiveContainer width="100%" height="90%">
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
-                      <XAxis dataKey="day" stroke="#525252" fontSize={12} tickMargin={10} />
-                      <YAxis domain={['auto', 'auto']} stroke="#525252" fontSize={12} tickFormatter={(val) => `$${val}`} />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: '#171717', border: '1px solid #262626', borderRadius: '8px' }}
-                        itemStyle={{ color: '#5ed29c' }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="price" 
-                        stroke="#5ed29c" 
-                        strokeWidth={3}
-                        dot={{ fill: '#070b0a', stroke: '#5ed29c', strokeWidth: 2 }}
-                        activeDot={{ r: 6, fill: '#5ed29c' }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-
-              {/* Data Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                {/* Market Data */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                  <h3 className="text-lg font-semibold text-white/80 mb-6 flex items-center gap-2">
-                    <Target size={20} className="text-[#5ed29c]" /> Market Data
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                      <span className="text-white/50 text-sm">Current Price</span>
-                      <span className="font-medium text-lg">${data.market_data.current_price}</span>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                      <span className="text-white/50 text-sm">RSI (14)</span>
-                      <span className="font-medium text-lg">{data.market_data.rsi}</span>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                      <span className="text-white/50 text-sm">EMA 20</span>
-                      <span className="font-medium text-lg">${data.market_data.ema20}</span>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                      <span className="text-white/50 text-sm">EMA 50</span>
-                      <span className="font-medium text-lg">${data.market_data.ema50}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-white/50 text-sm">ATR (14)</span>
-                      <span className="font-medium text-lg">${data.market_data.atr}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* AI Strategy */}
-                <div className="bg-[#5ed29c]/10 border border-[#5ed29c]/30 rounded-2xl p-6 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#5ed29c]/20 blur-3xl rounded-full -mr-10 -mt-10" />
-                  <h3 className="text-lg font-semibold text-[#5ed29c] mb-6 flex items-center gap-2 relative z-10">
-                    <Activity size={20} /> AI Strategy
-                  </h3>
-                  {aiRec.signal ? (
-                    <div className="space-y-4 relative z-10">
-                      <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                        <span className="text-white/50 text-sm">Signal</span>
-                        <span className={`font-bold text-lg px-3 py-1 rounded-md ${aiRec.signal === 'BUY' ? 'bg-[#5ed29c] text-black' : aiRec.signal === 'WAIT' ? 'bg-yellow-500 text-black' : 'bg-red-500 text-white'}`}>
-                          {aiRec.signal}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                        <span className="text-white/50 text-sm">Take Profit</span>
-                        <span className="font-medium text-[#5ed29c] text-lg">${aiRec.take_profit || '-'}</span>
-                      </div>
-                      <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                        <span className="text-white/50 text-sm">Stop Loss</span>
-                        <span className="font-medium text-red-400 text-lg">${aiRec.stop_loss || '-'}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-white/50 text-sm">Risk/Reward</span>
-                        <span className="font-medium text-lg">{aiRec.rr_ratio || '-'}</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-white/50 text-sm">กำลังประมวลผลข้อมูล AI...</p>
-                  )}
-                </div>
-
-                {/* Risk Engine */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                  <h3 className="text-lg font-semibold text-white/80 mb-6 flex items-center gap-2">
-                    <ShieldAlert size={20} className="text-yellow-500" /> Risk Engine (2%)
-                  </h3>
-                  {data.risk_management.valid ? (
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                        <span className="text-white/50 text-sm">Max Shares</span>
-                        <span className="font-bold text-yellow-500 text-xl">{data.risk_management.max_shares}</span>
-                      </div>
-                      <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                        <span className="text-white/50 text-sm">Capital Required</span>
-                        <span className="font-medium text-lg">${data.risk_management.max_cost_usd}</span>
-                      </div>
-                      <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                        <span className="text-white/50 text-sm">Max Risk Amount</span>
-                        <span className="font-medium text-lg">${data.risk_management.max_risk_usd}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-white/50 text-sm">Risk Per Share</span>
-                        <span className="font-medium text-lg">${data.risk_management.risk_per_share}</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-red-400 text-sm">{data.risk_management.message}</p>
-                  )}
-                </div>
-
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
+    return <HaloDashboard onBack={() => setIsStarted(false)} />;
   }
 
-  // --------------------------------------------------------
-  // VIEW 1: HERO LANDING PAGE
-  // --------------------------------------------------------
+  // หากยังไม่กดปุ่ม ให้แสดงหน้าแรก (DEA)
   return (
     <div className="relative min-h-screen bg-[#070b0a] text-white font-['Inter'] overflow-hidden">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter:wght@400;500;800&family=Plus+Jakarta+Sans:wght@700&display=swap');
         .liquid-glass {
-          background: rgba(255, 255, 255, 0.01);
-          background-blend-mode: luminosity;
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
-          position: relative;
+          background: rgba(255, 255, 255, 0.01); background-blend-mode: luminosity; backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1); position: relative;
         }
         .liquid-glass::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          padding: 1.4px;
-          border-radius: inherit;
+          content: ""; position: absolute; inset: 0; padding: 1.4px; border-radius: inherit;
           background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          pointer-events: none;
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
         }
         .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -301,11 +212,7 @@ export default function App() {
 
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] pointer-events-none z-0">
         <svg viewBox="0 0 800 500" className="w-full h-full opacity-50">
-          <defs>
-            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="25" />
-            </filter>
-          </defs>
+          <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="25" /></filter></defs>
           <ellipse cx="400" cy="50" rx="350" ry="150" fill="#0c4a45" filter="url(#glow)" />
         </svg>
       </div>
@@ -321,14 +228,6 @@ export default function App() {
           {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </header>
-
-      <div className={`fixed inset-0 bg-[#070b0a]/95 backdrop-blur-md z-40 flex flex-col justify-center items-center transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-        <nav className="flex flex-col space-y-8 text-center">
-          {['DASHBOARD', 'FEATURES', 'ABOUT', 'CONTACT'].map((link) => (
-            <a key={link} href={`#${link.toLowerCase()}`} className="text-2xl text-white hover:text-[#5ed29c] font-medium tracking-widest" onClick={() => setIsMobileMenuOpen(false)}>{link}</a>
-          ))}
-        </nav>
-      </div>
 
       <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 h-screen flex flex-col justify-center pt-24 animate-fade-in">
         <div className="w-[200px] h-[200px] rounded-[24px] p-6 flex flex-col justify-between -translate-y-[50px] liquid-glass mb-4 transition-transform hover:scale-[1.02] duration-500">
@@ -348,7 +247,6 @@ export default function App() {
             Master the US stock market with advanced technical analysis and strict 2% risk management rules.
           </p>
           
-          {/* อัปเดตปุ่ม Get Started ให้เปลี่ยนหน้าจอ */}
           <button 
             onClick={() => setIsStarted(true)} 
             className="bg-[#5ed29c] text-[#070b0a] font-bold text-[14px] uppercase tracking-wide rounded-full px-8 py-4 flex items-center space-x-3 hover:bg-white hover:scale-[1.02] active:scale-95 transition-all duration-300"
