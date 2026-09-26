@@ -8,7 +8,7 @@ class AIStrategyEngine:
         self, ticker: str, current_price: float, rsi: float, 
         ema20: float, ema50: float, atr: float, news_sentiment_score: float
     ):
-        prompt = f"""
+        prompt = """
         คุณคือ AI ด้านการวิเคราะห์เทคนิคอลและความเสี่ยง (Dime Expert Advisor)
         - หุ้น: {ticker} | ราคา: ${current_price} \vert{} RSI: {rsi} \vert{} EMA20:${ema20} | EMA50: ${ema50} \vert{} ATR:${atr}
         - News Sentiment Score: {news_sentiment_score}
@@ -21,7 +21,15 @@ class AIStrategyEngine:
             "rr_ratio": 0.0,
             "reasons": ["เหตุผล 1", "เหตุผล 2"]
         }}
-        """
+        """.format(
+            ticker=ticker,
+            current_price=current_price,
+            rsi=rsi,
+            ema20=ema20,
+            ema50=ema50,
+            atr=atr,
+            news_sentiment_score=news_sentiment_score
+        )
 
         raw_text = ""
 
@@ -43,7 +51,6 @@ class AIStrategyEngine:
         try:
             ai_data = json.loads(clean_text)
         except json.JSONDecodeError:
-            # กรณี AI ตอบมาผิดฟอร์แมต ให้ตั้งค่าเริ่มต้นไว้ป้องกันแอปแครช
             ai_data = {
                 "signal": "WAIT",
                 "stop_loss": 0.0,
