@@ -14,7 +14,7 @@ app.add_middleware(
 )
 # ---------------------------------------------
 
-app.include_router(analysis.router, prefix="/api/v1")
+app.include_router(analysis.router, prefix="/api/v1/analyze")
 app.include_router(journal.router, prefix="/api/v1")
 app.include_router(goal.router, prefix="/api/v1")
 
