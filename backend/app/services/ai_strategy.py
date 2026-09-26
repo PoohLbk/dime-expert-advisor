@@ -1,4 +1,6 @@
 import requests
+import json
+import re
 from app.config import settings
 
 class AIStrategyEngine:
@@ -8,7 +10,7 @@ class AIStrategyEngine:
     ):
         prompt = f"""
         คุณคือ AI ด้านการวิเคราะห์เทคนิคอลและความเสี่ยง (Dime Expert Advisor)
-        - หุ้น: {ticker} | ราคา: ${current_price} | RSI: {rsi} | EMA20: ${ema20} | EMA50: ${ema50} | ATR: ${atr}
+        - หุ้น: {ticker} | ราคา: ${current_price} \vert{} RSI: {rsi} \vert{} EMA20:${ema20} | EMA50: ${ema50} \vert{} ATR:${atr}
         - News Sentiment Score: {news_sentiment_score}
 
         คำนวณและตอบรูปแบบ JSON เท่านั้น:
@@ -21,12 +23,33 @@ class AIStrategyEngine:
         }}
         """
 
+        raw_text = ""
+
+        # 1. ดึงข้อความดิบจาก AI ตาม Provider ที่ตั้งค่าไว้
         if settings.AI_PROVIDER == "cloud" and settings.GEMINI_API_KEY:
             from google import genai
             client = genai.Client(api_key=settings.GEMINI_API_KEY)
             res = client.models.generate_content(model="gemini-3.8-flash", contents=prompt)
-            return res.text
+            raw_text = res.text
         else:
             payload = {"model": settings.OLLAMA_DEEPSEEK_MODEL, "prompt": prompt, "stream": False}
             res = requests.post(f"{settings.OLLAMA_BASE_URL}/api/generate", json=payload)
-            return res.json().get("response", "{}")
+            raw_text = res.json().get("response", "{}")
+
+        # 2. ทำความสะอาดข้อความ (ลบ ```json และ ``` ออกให้หมด)
+        clean_text = re.sub(r'```(?:json)?', '', raw_text).strip()
+        
+        # 3. แปลงเป็น Dictionary
+        try:
+            ai_data = json.loads(clean_text)
+        except json.JSONDecodeError:
+            # กรณี AI ตอบมาผิดฟอร์แมต ให้ตั้งค่าเริ่มต้นไว้ป้องกันแอปแครช
+            ai_data = {
+                "signal": "WAIT",
+                "stop_loss": 0.0,
+                "take_profit": 0.0,
+                "rr_ratio": 0.0,
+                "reasons": ["AI Response Format Error"]
+            }
+        
+        return ai_data
